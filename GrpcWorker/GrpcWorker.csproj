@@ -30,5 +30,8 @@
       <Compile Update="Services\OrderService.cs">
         <DependentUpon>IOrderService.cs</DependentUpon>
       </Compile>
+      <Compile Update="Services\OrderStorage.cs">
+        <DependentUpon>IOrderStorage.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

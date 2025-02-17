@@ -1,7 +1,14 @@
 ﻿namespace GrpcWorker.Dto;
 
-public record TradingDto(List<ClassesTradingDto> ClassesTradingDtos);
+public class TradingDto
+{
+    public List<ClassesTradingDto> ClassesTradingDtos { get; set; } = new();
+};
 
-public record ClassesTradingDto(string ClassName, List<string> Tickers);
+public class ClassesTradingDto
+{
+    public string ClassName {get; set;}
+    public List<string> Tickers {get; set;} = new();
+}
 
 public record ClassTickerDto(string ClassName, string Ticker);

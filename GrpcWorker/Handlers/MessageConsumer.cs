@@ -3,13 +3,15 @@ using Google.Protobuf;
 using GrpcWorker.Dto;
 using GrpcWorker.Services;
 using MassTransit;
+using Microsoft.Extensions.Options;
 using Models.MessageContract;
 using Qlua.Events;
 using Qlua.Structs;
 
 namespace GrpcWorker.Handlers;
 
-public class MessageConsumer(ILogger<MessageConsumer> logger,IClassService classService, IOrderService orderService) 
+public class MessageConsumer(ILogger<MessageConsumer> logger,IClassService classService, IOrderService orderService,
+    IOrderStorage orderStorage, IOptions<List<ClassesTradingDto>> tradingConfig) 
     : IConsumer<EventMessage>
 {
     public Task Consume(ConsumeContext<EventMessage> context)
@@ -22,6 +24,12 @@ public class MessageConsumer(ILogger<MessageConsumer> logger,IClassService class
                 eventData.MergeFrom(context.Message.Message);
                 ProcessQuoteEventInfo(eventData);
                 break;
+            
+            case EventType.OnOrder:
+                var order = new Order();
+                order.MergeFrom(context.Message.Message);
+                ProcessOrder(order);
+                break;
             default:
                 logger.LogInformation($"Message passed");
                 break;
@@ -31,6 +39,19 @@ public class MessageConsumer(ILogger<MessageConsumer> logger,IClassService class
 
     private void ProcessQuoteEventInfo(QuoteEventInfo eventInfo)
     {
+        if (tradingConfig.Value.Any())
+        {
+           if (!tradingConfig.Value
+                       .Select(y=>y.ClassName)
+                           .Contains(eventInfo.ClassCode)) return;
+           
+           if (!tradingConfig.Value
+                   .First(x=>x.ClassName==eventInfo.ClassCode)
+                       .Tickers
+                           .Contains(eventInfo.SecCode)) return; 
+        }
+        
+        
         var glass = classService.GetMarketGlass(eventInfo.SecCode, eventInfo.ClassCode);
         string info = $"Received quote message: {eventInfo.SecCode} {eventInfo.ClassCode}\n";
         var bidAmount = double.Parse(glass.BidCount, CultureInfo.InvariantCulture);
@@ -64,6 +85,11 @@ public class MessageConsumer(ILogger<MessageConsumer> logger,IClassService class
             }
         }
         logger.LogInformation(info);
+    }
+
+    private void ProcessOrder(Order order)
+    {
+        orderStorage.Orders.Add(order);
     }
     
 }

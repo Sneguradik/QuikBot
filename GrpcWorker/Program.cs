@@ -23,7 +23,7 @@ builder.Services.AddLogging();
 builder.Services.AddHostedService<Worker>();
 
 builder.Services.Configure<ConnectionDto>(builder.Configuration.GetSection("Connection"));
-builder.Services.Configure<TradingDto>(builder.Configuration.GetSection("Trading"));
+builder.Services.Configure<List<ClassesTradingDto>>(builder.Configuration.GetSection("Trading"));
 builder.Services.Configure<TradingAccount>(builder.Configuration.GetSection("TradingAccount"));
 
 builder.Services.AddMassTransit(x =>

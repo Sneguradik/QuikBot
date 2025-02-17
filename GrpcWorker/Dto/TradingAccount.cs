@@ -1,3 +1,7 @@
 ﻿namespace GrpcWorker.Dto;
 
-public record TradingAccount(string TradeAccount, string ClientCode);
+public class TradingAccount
+{
+    public string Account { get; set; } = string.Empty;
+    public string ClientCode { get; set; } = string.Empty;
+}
