@@ -39,6 +39,7 @@ builder.Services.AddMassTransit(x =>
 builder.Services.AddSingleton<ISocketService, SocketService>();
 builder.Services.AddScoped<IClassService, ClassService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddSingleton<IOrderStorage, OrderStorage>();
 
 var app = builder.Build();
 

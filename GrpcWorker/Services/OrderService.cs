@@ -74,9 +74,10 @@ public class OrderService(ISocketService socketService, IOptions<TradingAccount>
         args.Transaction.Add("OPERATION", operationType);
         args.Transaction.Add("PRICE", order.Price.ToString(CultureInfo.InvariantCulture));
         args.Transaction.Add("QUANTITY", order.Quantity.ToString());
-        args.Transaction.Add("TRADE_ACCOUNT", tradingAccount.Value.Account);
+        args.Transaction.Add("ACCOUNT", tradingAccount.Value.Account);
         args.Transaction.Add("CLIENT_CODE", tradingAccount.Value.ClientCode);
-
+        args.Transaction.Add("TYPE", "L");
+        args.Transaction.Add("TRANS_ID", "1");
 
         var resp = socketService.SendRequest(new Request()
         {

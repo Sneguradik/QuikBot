@@ -28,7 +28,9 @@ public class MessageConsumer(ILogger<MessageConsumer> logger,IClassService class
             case EventType.OnOrder:
                 var order = new Order();
                 order.MergeFrom(context.Message.Message);
-                ProcessOrder(order);
+                
+                //logger.LogInformation($"Order {order.TransId} {order.SecCode} {order.ClassCode}");
+                //ProcessOrder(order);
                 break;
             default:
                 logger.LogInformation($"Message passed");
@@ -64,10 +66,13 @@ public class MessageConsumer(ILogger<MessageConsumer> logger,IClassService class
             var iterBids = bidAmount>5?5:bidAmount;
             for (int i = 0; i < iterBids; i++)
             {
+                Console.WriteLine(
+                    $"{eventInfo.SecCode}: {eventInfo.ClassCode}: {Convert.ToDouble(glass.Bids[i].Price, CultureInfo.InvariantCulture) * (100 - i - 1) / 100}");
                 orderService.Buy(new OrderDto(
-                    eventInfo.SecCode, 
+                    eventInfo.SecCode,
                     eventInfo.ClassCode,
-                    Convert.ToDouble(glass.Bids[(int)bidAmount - 1 - i].Price)*(100-i-1)/100, 1));
+                    Math.Round(Convert.ToDouble(glass.Bids[(int)bidAmount - 1 - i].Price, CultureInfo.InvariantCulture)*(100-i-1)/100,2),
+                    1));
             }
         }
 
@@ -78,6 +83,7 @@ public class MessageConsumer(ILogger<MessageConsumer> logger,IClassService class
             var iterOffers = offerAmount>5?5:offerAmount;
             for (int i = 0; i < iterOffers; i++)
             {
+                Console.WriteLine($"{eventInfo.SecCode}: {eventInfo.ClassCode}: {Convert.ToDouble(glass.Offers[i].Price, CultureInfo.InvariantCulture)*(100+i+1)/100}");
                 orderService.Sell(new OrderDto(
                     eventInfo.SecCode, 
                     eventInfo.ClassCode,
